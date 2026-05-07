@@ -56,11 +56,14 @@ const testConnection = async () => {
   }
   try {
     const conn = await pool.getConnection();
-    console.log(`✅ MySQL connected successfully (${useAiven ? 'Aiven' : 'local'})`);
+    const host = useAiven
+      ? `${process.env.AIVEN_DB_HOST}:${process.env.AIVEN_DB_PORT}`
+      : `${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || 3306}`;
+    console.log(`✅ MySQL connected (${useAiven ? 'Aiven' : 'local'}) → ${host}`);
     conn.release();
     return true;
   } catch (err) {
-    console.error('❌ MySQL connection failed:', err.message);
+    console.error(`❌ MySQL connection failed (${useAiven ? 'Aiven' : 'local'}):`, err.message);
     console.error('   → Server will start anyway; DB-backed routes will fail until the database is reachable.');
     return false;
   }
